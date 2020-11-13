@@ -11,7 +11,6 @@ from opentelemetry.sdk.trace.export import (
 )
 from opentelemetry.ext.lightstep import LightStepSpanExporter
 from opentelemetry.ext.honeycomb import HoneycombSpanExporter
-from opentelemetry.ext.jaeger import JaegerSpanExporter
 from opentelemetry.ext.flask import FlaskInstrumentor
 
 FlaskInstrumentor().instrument()
@@ -36,13 +35,6 @@ hnyExporter = HoneycombSpanExporter(
 	dataset="opentelemetry",
 )
 
-exporter = JaegerSpanExporter(
-  service_name=serviceName,
-  agent_host_name=os.environ['JAEGER_HOST'],
-  agent_port=6831,
-)
-
-trace.get_tracer_provider().add_span_processor(BatchExportSpanProcessor(exporter))
 trace.get_tracer_provider().add_span_processor(SimpleExportSpanProcessor(ConsoleSpanExporter()))
 # trace.get_tracer_provider().add_span_processor(BatchExportSpanProcessor(lsExporter))
 trace.get_tracer_provider().add_span_processor(BatchExportSpanProcessor(hnyExporter))
