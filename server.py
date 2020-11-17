@@ -2,16 +2,15 @@
 from opentelemetry import (
   trace
 )
-from opentelemetry.ext.requests import RequestsInstrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
   SimpleExportSpanProcessor,
   BatchExportSpanProcessor,
   ConsoleSpanExporter,
 )
-from opentelemetry.ext.lightstep import LightStepSpanExporter
 from opentelemetry.ext.honeycomb import HoneycombSpanExporter
-from opentelemetry.ext.flask import FlaskInstrumentor
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
 
 FlaskInstrumentor().instrument()
 
@@ -56,7 +55,7 @@ def root():
 @app.route("/fibInternal")
 def fibHandler():
   value = int(request.args.get('i'))
-  current_span = tracer.get_current_span()
+  current_span = trace.get_current_span()
   current_span.set_attribute("request", value)
   returnValue = 0
   if value == 1 or value == 0:
