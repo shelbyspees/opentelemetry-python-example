@@ -24,10 +24,28 @@ Once you've set up your development environment you can run the app, replacing t
 $ HONEYCOMB_API_KEY=abc123 python3 server.py
 ```
 
+Get your API key via https://ui.honeycomb.io/account after signing up for Honeycomb.
+
+
+## Make a request
+
+Now that the app is running, you should be able to make a request:
+
+```console
+$ curl localhost:5000
+```
+
+You should get the response:
+```
+Visit http://localhost:5000/fib?i=1
+```
+
+You can update the value of `i` to see what the Fibonacci return values are.
+
 [Go to the Honeycomb UI](https://ui.honeycomb.io/home) and watch your data arrive!
 
 ## Troubleshooting
 
-Make sure your API key has permission to create datasets.
+If you don't see data coming in, make sure your API key has permission to create datasets. You can check your API key permissions at https://ui.honeycomb.io/account.
 
 For other questions, please ask the Honeycomb team in Slack.

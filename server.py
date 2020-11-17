@@ -38,7 +38,7 @@ app = Flask(__name__)
 @app.route("/")
 def root():
   sys.stdout.write('\n')
-  return "Click [Tools] > [Logs] to see spans!"
+  return "Visit http://localhost:5000/fib?i=1"
 
 
 @app.route("/fib")
