@@ -1,7 +1,4 @@
-
-from opentelemetry import (
-  trace
-)
+from opentelemetry import trace
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
@@ -21,25 +18,18 @@ import sys
 
 trace.set_tracer_provider(TracerProvider())
 
-serviceName = os.environ['PROJECT_NAME']
-
-lsExporter = LightStepSpanExporter(
-  name=serviceName,
-  token=os.environ['LS_KEY']
-)
-
+# send your data to Honeycomb
 hnyExporter = HoneycombSpanExporter(
-	service_name=serviceName,
-	writekey=os.environ['HNY_KEY'],
-	dataset="opentelemetry",
+	service_name="fibonacci",
+  # Get this via https://ui.honeycomb.io/account after signing up for Honeycomb
+	writekey=os.environ['HONEYCOMB_API_KEY'],
+	dataset="kubecon2020",
 )
 
 trace.get_tracer_provider().add_span_processor(SimpleExportSpanProcessor(ConsoleSpanExporter()))
-# trace.get_tracer_provider().add_span_processor(BatchExportSpanProcessor(lsExporter))
 trace.get_tracer_provider().add_span_processor(BatchExportSpanProcessor(hnyExporter))
 
 tracer = trace.get_tracer(__name__)
-
 RequestsInstrumentor().instrument(tracer_provider=trace.get_tracer_provider())
 
 app = Flask(__name__)
