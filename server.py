@@ -23,7 +23,7 @@ hnyExporter = HoneycombSpanExporter(
 	service_name="fibonacci",
   # Get this via https://ui.honeycomb.io/account after signing up for Honeycomb
 	writekey=os.environ['HONEYCOMB_API_KEY'],
-	dataset="kubecon2020",
+	dataset="srecon2020",
 )
 
 trace.get_tracer_provider().add_span_processor(SimpleExportSpanProcessor(ConsoleSpanExporter()))
