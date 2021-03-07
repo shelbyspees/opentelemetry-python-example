@@ -1,0 +1,19 @@
+ListenAddr = "0.0.0.0:8080"
+PeerListenAddr = "0.0.0.0:8081"
+HoneycombAPI = "https://api.honeycomb.io"
+LoggingLevel = "debug"
+SendDelay = "2s"
+TraceTimeout = "300s"
+SendTicker = "100ms"
+UpstreamBufferSize = 1000
+PeerBufferSize = 1000
+
+Logger = "logrus"
+Metrics = "prometheus"
+
+[InMemCollector]
+CacheCapacity = 1000
+MaxAlloc = 0
+
+[PrometheusMetrics]
+MetricsListenAddr = "0.0.0.0:9090"

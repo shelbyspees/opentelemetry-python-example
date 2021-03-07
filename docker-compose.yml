@@ -1,0 +1,20 @@
+services:
+  refinery:
+    image: honeycombio/refinery
+    volumes:
+      - ./refinery:/etc/refinery
+    expose:
+      - "8080"
+    command: refinery -c /etc/refinery/config.toml -r /etc/refinery/rules.toml
+  app:
+    build: .
+    command: python3 /app/server.py &
+    volumes:
+      - .:/app
+    depends_on:
+      - refinery
+    ports:
+      - "5000:5000"
+    environment:
+      - HONEYCOMB_API_KEY
+      - HONEYCOMB_API_HOST

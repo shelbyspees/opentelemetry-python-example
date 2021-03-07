@@ -1,0 +1,20 @@
+Sampler = "RulesBasedSampler"
+
+[[rule]]
+  name = "500 errors"
+  SampleRate = 1
+  [[rule.condition]]
+    field = "status_code"
+    operator = "="
+    value = 500
+
+[[rule]]
+  name = "drop 200 responses"
+  drop = true
+  [[rule.condition]]
+    field = "status_code"
+    operator = "="
+    value = 200
+
+[[rule]]
+  SampleRate = 2
