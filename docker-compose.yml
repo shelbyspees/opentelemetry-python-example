@@ -8,7 +8,7 @@ services:
     command: refinery -c /etc/refinery/config.toml -r /etc/refinery/rules.toml
   app:
     build: .
-    command: python3 /app/server.py &
+    command: python3 /app/server.py
     volumes:
       - .:/app
     depends_on:
