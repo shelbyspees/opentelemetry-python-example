@@ -21,7 +21,7 @@ The app already has the [Honeycomb exporter](https://github.com/honeycombio/open
 Once you've set up your development environment you can run the app, replacing the fake API key with your own:
 
 ```console
-$ HONEYCOMB_API_KEY=abc123 python3 server.py
+HONEYCOMB_API_KEY=abc123 HONEYCOMB_DATASET=my-dataset python3 server.py
 ```
 
 Get your API key via https://ui.honeycomb.io/account after signing up for Honeycomb.
