@@ -3,38 +3,49 @@ import sys
 
 import requests
 from flask import Flask, request
+# Required for sending telemetry to Honeycomb
+from grpc import ssl_channel_credentials
+# Required instrumentation packages
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import \
     OTLPSpanExporter
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import (BatchExportSpanProcessor,
+from opentelemetry.sdk.trace.export import (BatchSpanProcessor,
                                             ConsoleSpanExporter,
-                                            SimpleExportSpanProcessor)
+                                            SimpleSpanProcessor)
 
-FlaskInstrumentor().instrument()
-
-
-trace.set_tracer_provider(TracerProvider())
-
-# send your data to Honeycomb
-hnyExporter = HoneycombSpanExporter(
-    service_name="fibonacci",
-    # Get this via https://ui.honeycomb.io/account after signing up for Honeycomb
-    writekey=os.environ['HONEYCOMB_API_KEY'],
-    dataset="srecon2020",
+# Configure exporter to send to Honeycomb
+otlp_exporter = OTLPSpanExporter(
+    endpoint="api.honeycomb.io:443",
+    credentials=ssl_channel_credentials(),
+    headers=(
+        ("x-honeycomb-team", os.environ['HONEYCOMB_API_KEY']),
+        ("x-honeycomb-dataset", os.environ['HONEYCOMB_DATASET'])
+    )
 )
 
-trace.get_tracer_provider().add_span_processor(
-    SimpleExportSpanProcessor(ConsoleSpanExporter()))
-trace.get_tracer_provider().add_span_processor(
-    BatchExportSpanProcessor(hnyExporter))
 
-tracer = trace.get_tracer(__name__)
-RequestsInstrumentor().instrument(tracer_provider=trace.get_tracer_provider())
+# Configure trace handler object
+trace.set_tracer_provider(TracerProvider(
+    resource=Resource({"service.name": "fibonacci"})))
+# tell trace handler to print to stdout
+trace.get_tracer_provider().add_span_processor(
+    SimpleSpanProcessor(ConsoleSpanExporter()))
+# tell trace handler to send using OTLP exporter
+trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(otlp_exporter))
 
+
+# This is the actual app
 app = Flask(__name__)
+
+
+# Tell auto-instrumentation to instrument this app
+FlaskInstrumentor().instrument_app(app)
+# Build Flask requests into traces
+RequestsInstrumentor().instrument()
 
 
 @app.route("/")
@@ -44,30 +55,28 @@ def root():
 
 
 @app.route("/fib")
-@app.route("/fibInternal")
-def fibHandler():
+@app.route("/fib_internal")
+def fib():
     value = int(request.args.get('i'))
     current_span = trace.get_current_span()
     current_span.set_attribute("request", value)
-    returnValue = 0
+    result = 0
     if value == 1 or value == 0:
-        returnValue = 0
+        result = 0
     elif value == 2:
-        returnValue = 1
+        result = 1
     else:
-        minusOnePayload = {'i': value - 1}
-        minusTwoPayload = {'i': value - 2}
-        with tracer.start_as_current_span("get_minus_one") as span:
-            span.set_attribute("payloadValue", value-1)
-            respOne = requests.get(
-                'http://127.0.0.1:5000/fibInternal', minusOnePayload)
-        with tracer.start_as_current_span("get_minus_two") as span:
-            span.set_attribute("payloadValue", value-2)
-            respTwo = requests.get(
-                'http://127.0.0.1:5000/fibInternal', minusTwoPayload)
-        returnValue = int(respOne.content) + int(respTwo.content)
+        minus_one_payload = {'i': value - 1}
+        minus_two_payload = {'i': value - 2}
+        current_span.set_attribute("payload_value_one", value-1)
+        resp_one = requests.get(
+            'http://127.0.0.1:5000/fib_internal', minus_one_payload)
+        current_span.set_attribute("payload_value_two", value-2)
+        resp_two = requests.get(
+            'http://127.0.0.1:5000/fib_internal', minus_two_payload)
+        result = int(resp_one.content) + int(resp_two.content)
     sys.stdout.write('\n')
-    return str(returnValue)
+    return str(result)
 
 
 if __name__ == "__main__":
