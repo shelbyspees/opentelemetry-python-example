@@ -4,7 +4,8 @@ import sys
 import requests
 from flask import Flask, request
 from opentelemetry import trace
-from opentelemetry.ext.honeycomb import HoneycombSpanExporter
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import \
+    OTLPSpanExporter
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.sdk.trace import TracerProvider
