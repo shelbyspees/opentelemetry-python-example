@@ -4,7 +4,6 @@ import sys
 import requests
 from flask import Flask, request
 # Required for sending telemetry to Honeycomb
-from grpc import ssl_channel_credentials
 # Required instrumentation packages
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import \
@@ -19,12 +18,12 @@ from opentelemetry.sdk.trace.export import (BatchSpanProcessor,
 
 # Configure exporter to send to Honeycomb
 otlp_exporter = OTLPSpanExporter(
-    endpoint="api.honeycomb.io:443",
-    credentials=ssl_channel_credentials(),
+    endpoint=os.environ["HONEYCOMB_API_HOST"],
+    insecure=True,
     headers=(
         ("x-honeycomb-team", os.environ['HONEYCOMB_API_KEY']),
         ("x-honeycomb-dataset", os.environ['HONEYCOMB_DATASET'])
-    )
+    ),
 )
 
 
@@ -80,4 +79,4 @@ def fib():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")

@@ -1,4 +1,4 @@
-ListenAddr = "0.0.0.0:8080"
+GRPCListenAddr = "0.0.0.0:8080"
 PeerListenAddr = "0.0.0.0:8081"
 HoneycombAPI = "https://api.honeycomb.io"
 LoggingLevel = "debug"
