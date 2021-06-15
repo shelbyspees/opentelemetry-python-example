@@ -18,3 +18,4 @@ services:
     environment:
       - HONEYCOMB_API_KEY
       - HONEYCOMB_API_HOST
+      - HONEYCOMB_DATASET
